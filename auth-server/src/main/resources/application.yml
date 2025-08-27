@@ -1,0 +1,63 @@
+server:
+  port: 8200
+spring:
+  application:
+    name: spring-cloud-auth-server
+  security:
+    oauth2:
+      authorizationserver:
+        client:
+          test1:
+            registration:
+              client-id: test1
+              client-secret: 123456
+              scopes:
+                - user.info
+                - all
+              client-authentication-methods:
+                - client_secret_basic
+              authorization-grant-types:
+                - authorization_code
+                - refresh_token
+                - client_credentials
+              redirect-uris:
+                - http://127.0.0.1:9000/login/oauth2/code/test1
+              post-logout-redirect-uris:
+                - http://127.0.0.1:8080/
+  cloud:
+    nacos:
+      config:
+        server-addr: 127.0.0.1:8848
+        namespace: public
+        file-extension: yaml
+        enabled: true # default is true
+      discovery:
+        server-addr: 127.0.0.1:8848
+        enabled: true
+        group: DEFAULT_GROUP
+    sentinel:
+      transport:
+        dashboard: localhost:7000
+    loadbalancer:
+      nacos:
+        enabled: true
+  config:
+    import: nacos:${spring.application.name}
+  main:
+    allow-bean-definition-overriding: true
+
+management:
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+    shutdown:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+logging:
+  level:
+    root: debug
+

@@ -1,0 +1,65 @@
+server:
+  port: 8000
+spring:
+  application:
+    name: spring-cloud-provider
+  cloud:
+    nacos:
+      config:
+        server-addr: 127.0.0.1:8848
+        namespace: public
+        file-extension: yaml
+        enabled: true # default is true
+      discovery:
+        server-addr: 127.0.0.1:8848
+        weight: 5
+        group: DEFAULT_GROUP
+    sentinel:
+      transport:
+        dashboard: localhost:7000
+  config:
+    import: optional:nacos:${spring.application.name}
+  datasource:
+    url: jdbc:mysql://172.20.45.172:3306/oid?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&rewriteBatchedStatements=true&serverTimezone=Asia/Shanghai&connectionCollation=utf8mb4_general_ci
+    username: root
+    password: a)p#UCi~
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+management:
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+    shutdown:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+#logging:
+#  level:
+#    root: debug
+seata:
+  # 事务分组（默认default_tx_group）
+  tx-service-group: default_tx_group
+  service:
+    vgroup-mapping:
+      # 事务分组与seata-server集群的映射关系
+      default_tx_group: default
+  config:
+    type: nacos
+    nacos:
+      server-addr: 127.0.0.1:8848
+      group: 'SEATA_GROUP'
+      namespace: ''
+      dataId: 'seataServer'
+  registry:
+    type: nacos
+    nacos:
+      # 注册到seata服务端的应用名称
+      application: seata-server
+      server-addr: 127.0.0.1:8848
+      group: 'SEATA_GROUP'
+      namespace: ''
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml

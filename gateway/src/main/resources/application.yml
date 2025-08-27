@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: spring-cloud-gateway
+  cloud:
+    sentinel:
+      transport:
+        dashboard: localhost:7000
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        enabled: true
+        group: DEFAULT_GROUP
+    gateway:
+      enabled: true
+      routes:
+        - id: route-baidu
+          uri: http://www.baidu.com
+          predicates:
+            - After=2019-09-01T00:00:00Z
+            - Cookie=route, baidu
+            - Method=GET
+          filters:
+            - AddResponseHeader=X-Response-Service, spring-cloud-gateway
+        - id: could-consumer
+          uri: lb://spring-cloud-consumer
+          predicates:
+            - Path=/consumer/**
+          filters:
+            - StripPrefix=1
+        - id: could-provider
+          uri: lb://spring-cloud-provider
+          predicates:
+            - Path=/provider/**
+          filters:
+            - StripPrefix=1
+        - id: could-auth-server
+          uri: lb://spring-cloud-auth-server
+          predicates:
+            - Path=/auth-server/**
+          filters:
+            - StripPrefix=1
+server:
+  port: 9000
+
+management:
+  endpoint:
+    gateway:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: gateway
+logging:
+  level:
+    root: DEBUG

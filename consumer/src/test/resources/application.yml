@@ -1,0 +1,85 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+server:
+  port: 7091
+
+spring:
+  application:
+    name: seata-server
+
+logging:
+  config: classpath:logback-spring.xml
+  file:
+    path: ${log.home:${user.home}/logs/seata}
+  extend:
+    logstash-appender:
+      destination: 127.0.0.1:4560
+    kafka-appender:
+      bootstrap-servers: 127.0.0.1:9092
+      topic: logback_to_logstash
+
+console:
+  user:
+    username: seata
+    password: seata
+seata:
+  config:
+    # support: nacos, consul, apollo, zk, etcd3
+    type: nacos
+    nacos:
+      # nacos配置中心地址
+      server-addr: localhost:8848
+      # nacos命名空间，""为nacos保留public空间，用户勿配置namespace="public"
+      namespace: ''
+      # 配置分组名
+      group: SEATA_GROUP
+      context-path: ''
+      # 从一个Nacos dataId中获取所有配置信息，首先需要在nacos新建配置，此处dataId为seataServer.properties
+      dataId: "seataServer.properties"
+  registry:
+    # support: nacos, eureka, redis, zk, consul, etcd3, sofa
+    type: nacos
+    nacos:
+      # 指定注册至nacos注册中心的服务名
+      application: seata-server
+      # nacos注册中心地址
+      server-addr: localhost:8848
+      # 指定注册到nacos注册中心的分组名
+      group: SEATA_GROUP
+      # nacos命名空间，""为nacos保留public空间，用户勿配置namespace="public"
+      namespace:
+      # 指定注册至nacos注册中心的集群名
+      # 与配置中心文件中的service.vgroupMapping.[事务分组配置项]=TC集群的名称保持一致
+      cluster: default
+      context-path: ''
+  store:
+    # support: file 、 db 、 redis 、 raft
+    # 配置中心获取
+    mode: db
+    lock:
+      mode: db
+    session:
+      mode: db
+  #  server:
+  #    service-port: 8091 #If not configured, the default is '${server.port} + 1000'
+  security:
+    secretKey: SeataSecretKey0c382ef121d778043159209298fd40bf3850a017
+    tokenValidityInMilliseconds: 1800000
+    csrf-ignore-urls: /metadata/v1/**
+    ignore:
+      urls: /,/**/*.css,/**/*.js,/**/*.html,/**/*.map,/**/*.svg,/**/*.png,/**/*.jpeg,/**/*.ico,/api/v1/auth/login,/version.json,/health,/error,/vgroup/v1/**

@@ -1,0 +1,73 @@
+server:
+  port: 8100
+spring:
+  application:
+    name: spring-cloud-consumer
+  cloud:
+    nacos:
+      config:
+        server-addr: 127.0.0.1:8848
+        namespace: public
+        file-extension: yaml
+        enabled: true # default is true
+      discovery:
+        server-addr: 127.0.0.1:8848
+        enabled: true
+        group: DEFAULT_GROUP
+    sentinel:
+      transport:
+        dashboard: localhost:7000
+    loadbalancer:
+      nacos:
+        enabled: true
+    openfeign:
+      client:
+        config:
+          default: # default config for all openfeign clients
+            connectTimeout: 5000
+            readTimeout: 5000
+      sentinel:
+        enabled: true
+  config:
+    import: nacos:${spring.application.name}
+  main:
+    allow-bean-definition-overriding: true
+# seata分步式事务
+seata:
+  enabled: true
+  # 事务分组（默认default_tx_group）
+  tx-service-group: default_tx_group
+  service:
+    vgroup-mapping:
+      # 事务分组与seata-server集群的映射关系
+      default_tx_group: default
+  config:
+    type: nacos
+    nacos:
+      server-addr: 127.0.0.1:8848
+      group: 'SEATA_GROUP'
+      namespace: ''
+      dataId: 'seataServer'
+  registry:
+    type: nacos
+    nacos:
+      # 注册到seata服务端的应用名称
+      application: seata-server
+      server-addr: 127.0.0.1:8848
+      group: 'SEATA_GROUP'
+      namespace: ''
+
+management:
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+    shutdown:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+## application.yml
+
