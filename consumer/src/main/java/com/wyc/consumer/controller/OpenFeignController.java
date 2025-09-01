@@ -4,9 +4,13 @@ import com.wyc.consumer.service.EchoService;
 import com.wyc.consumer.service.StorageService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @Author: wuychs
@@ -18,9 +22,8 @@ public class OpenFeignController {
     @Autowired
     private EchoService echoService;
 
-
     @GetMapping("/feign/echo/{message}")
-    public String feignEcho(@PathVariable String message) {
+    public String feignEcho(HttpServletRequest request, @PathVariable String message) {
         return echoService.echo(message);
     }
 }
